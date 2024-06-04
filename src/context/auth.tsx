@@ -1,8 +1,9 @@
-import { auth, db } from "@/lib/firebase";
-import { User } from "@/types/user";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
+
+import { auth, db } from "@/lib/firebase";
+import { User } from "@/types/user";
 
 type UserContextType = User | null | undefined;
 
@@ -17,23 +18,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
       }
 
-      const userRef = doc(db, `users/${firebaseUser?.uid}`);
-      const snap = await getDoc(userRef);
+      if (firebaseUser) {
+        const userRef = doc(db, `users/${firebaseUser.uid}`);
+        const snap = await getDoc(userRef);
 
-      if (snap.exists()) {
-        const appUser = snap.data() as User;
-        setUser(appUser);
-      } else {
-        const appUser: User = {
-          id: firebaseUser?.uid!,
-          name: firebaseUser?.displayName!,
-        };
+        if (snap.exists()) {
+          const appUser = snap.data() as User;
+          setUser(appUser);
+        } else {
+          const appUser: User = {
+            id: firebaseUser.uid,
+            name: firebaseUser.displayName || "匿名ユーザー",
+          };
 
-        setDoc(userRef, appUser).then(() => setUser(appUser));
+          void setDoc(userRef, appUser)
+            .then(() => {
+              setUser(appUser);
+            })
+            .catch(() => {
+              console.error("Failed to set document");
+            });
+        }
       }
-
-      return unsubscribe;
     });
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;

@@ -1,4 +1,5 @@
 import { GoogleAuthProvider, signInWithRedirect, signOut } from "firebase/auth";
+
 import { auth } from "./firebase";
 
 export const login = async () => {
