@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "@/context/auth";
 import { login, logout } from "@/lib/auth";
@@ -20,6 +20,10 @@ export const Auth = () => {
                 setWaiting(false);
             });
     };
+
+    useEffect(() => {
+        console.log(user);
+    }, [waiting]);
 
     return (
         <div>

@@ -1,3 +1,4 @@
+'use client'
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -39,8 +40,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             } else {
                 setUser(null);
             }
+            return unsubscribe;
         });
-        return unsubscribe;
     }, []);
 
     return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
